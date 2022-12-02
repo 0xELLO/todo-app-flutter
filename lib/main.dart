@@ -1,12 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:todo_app_flutter/models/AuthStateModel.dart';
+import 'package:todo_app_flutter/screens/CategoriesScreen.dart';
 import 'package:todo_app_flutter/screens/login/LoginScreen.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+    create: (_) => AuthStateModel(),
+    child: const MyApp()
+    ));
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
+  final loginEntry = const MainPage();
+  final categoryEntry = const CategoriesScreen();
 
   // This widget is the root of your application.
   @override
@@ -25,7 +34,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: const MainPage(),
+      home: Provider.of<AuthStateModel>(context).value ? loginEntry : categoryEntry,
     );
   }
 }
