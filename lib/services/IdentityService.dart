@@ -20,8 +20,49 @@ class IdentityService{
     );
     if (response.statusCode == 200) {
         final jwtResponce = JwtResponse.fromJson(jsonDecode(response.body));
+        await storage.deleteAll();
         await storage.write(key: 'jwt', value: jwtResponce.token);
         await storage.write(key: 'refreshToken', value: jwtResponce.refreshToken);
+        return true;
+    } else {
+      log("ERROR");
+      log(response.statusCode.toString());
+      log(response.body);
+      log("ERROR");
+      return false;
+    }
+  }
+
+  Future<bool> refreshToken() async {
+    var jwt = await storage.read(key: 'jwt');
+    var refreshToken = await storage.read(key: 'refreshToken');
+    log(jwt!);
+
+    if (jwt == null || refreshToken == null) {
+      log('no jwt in storage');
+      return false;
+    }
+
+    final response = await http.post(
+      Uri.parse('$url/RefreshToken'),
+      body: jsonEncode(<String, String>{
+        'jwt': jwt,
+        'refreshToken': refreshToken
+      }),
+      headers: <String, String>{
+        'content-type': 'application/json'
+      }
+    );
+    if (response.statusCode == 200) {
+        Map<String, dynamic> jwtResponce = jsonDecode(response.body);
+        log('NEW JWT');
+        log(jwtResponce['token']);
+        await storage.deleteAll();
+        await storage.write(key: 'jwt', value: jwtResponce['token']);
+        await storage.write(key: 'refreshToken', value: jwtResponce['refreshToken']);
+        log('NEW JWT VALUe');
+        log((await storage.read(key: 'jwt'))!);
+        log('refresshed succesfuly');
         return true;
     } else {
       log("ERROR");

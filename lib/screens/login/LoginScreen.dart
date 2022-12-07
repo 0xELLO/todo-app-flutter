@@ -78,8 +78,6 @@ class _LoginScreenWidgetState extends State<LoginScreenWidget> {
                       final res = await identityService.login(nameController.text, passwordController.text);
                       if (res) {
                         Provider.of<AuthStateModel>(context, listen: false).set(true);
-                      } else {
-                        
                       }
                       
                     }
